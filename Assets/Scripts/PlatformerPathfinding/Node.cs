@@ -26,4 +26,13 @@ namespace PlatformerPathFinding {
             Y = y;
         }
     }
+
+    class PlatformerNode : Node {
+
+        public int Jump { get; set; }
+        
+        public PlatformerNode(bool isWalkable, Vector2 worldPositionCenter, int x, int y) 
+            : base(isWalkable, worldPositionCenter, x, y) {
+        }
+    }
 }

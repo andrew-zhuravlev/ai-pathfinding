@@ -29,7 +29,7 @@ namespace PlatformerPathFinding {
                     break;
 
                 foreach (Node neighbour in neighboursProvider.GetNeighbours(grid, node)) {
-                    if (!neighbour.IsWalkable || closedSet.Contains(neighbour))
+                    if (/*!neighbour.IsWalkable ||*/ closedSet.Contains(neighbour))
                         continue;
 
                     int newCostToNeighbour = node.GCost + 1;
