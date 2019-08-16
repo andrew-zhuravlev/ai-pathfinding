@@ -5,12 +5,12 @@ namespace PlatformerPathFinding {
         
         public delegate int Heuristics(Node start, Node goal);
         
-        public static List<Node> Search(this Grid grid, Node start, Node goal, INeighboursProvider neighboursProvider,
-            Heuristics heuristics) {
+        public static List<Node> Search(this Grid grid, Node start, Node goal, IPathFindingRules rules) {
             
             var openSet = new List<Node>();
             var closedSet = new HashSet<Node>();
             openSet.Add(start);
+            var foundGoal = false;
 
             while (openSet.Count > 0) {
                 // Get the node with lowest FCost
@@ -25,17 +25,20 @@ namespace PlatformerPathFinding {
                 openSet.Remove(node);
                 closedSet.Add(node);
 
-                if (node == goal)
-                    break;
+                if (node == goal) {
+                    foundGoal = true;     
+                    break;                    
+                }
 
-                foreach (Node neighbour in neighboursProvider.GetNeighbours(grid, node)) {
+                foreach (Node neighbour in rules.GetNeighbours(grid, node)) {
                     if (/*!neighbour.IsWalkable ||*/ closedSet.Contains(neighbour))
                         continue;
 
-                    int newCostToNeighbour = node.GCost + 1;
-                    if (newCostToNeighbour < neighbour.GCost || !openSet.Contains(neighbour)) {
-                        neighbour.GCost = newCostToNeighbour;
-                        neighbour.HCost = heuristics(neighbour, goal);
+                    // TODO: Get Distance
+                    int newCost = node.GCost + 1;
+                    if (newCost < neighbour.GCost || !openSet.Contains(neighbour)) {
+                        neighbour.GCost = newCost;
+                        neighbour.HCost = rules.GetHeuristic(neighbour, goal);
                         neighbour.Parent = node;
 
                         if (!openSet.Contains(neighbour))
@@ -44,7 +47,7 @@ namespace PlatformerPathFinding {
                 }
             }
 
-            return RetracePath(goal);
+            return foundGoal ? RetracePath(goal) : null;
         }
 
         static List<Node> RetracePath(Node goal) {

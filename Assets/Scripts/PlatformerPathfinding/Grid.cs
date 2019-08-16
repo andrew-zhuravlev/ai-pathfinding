@@ -13,8 +13,7 @@
         }
 
         public bool CheckNode(int y, int x) {
-            return (x >= 0 && y >= 0 && x < _sizeX && y < _sizeY) 
-                   && _grid[y, x].IsWalkable;
+            return x >= 0 && y >= 0 && x < _sizeX && y < _sizeY;
         }
 
         public Node GetNode(int y, int x) {

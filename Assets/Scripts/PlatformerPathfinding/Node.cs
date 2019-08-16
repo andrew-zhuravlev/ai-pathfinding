@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace PlatformerPathFinding {
     public class Node {
-        public bool IsWalkable { get; }
+        public bool IsEmpty { get; }
         Vector2 _worldPositionCenter;
 
         public int Y { get; }
@@ -19,20 +19,11 @@ namespace PlatformerPathFinding {
 
         public Node Parent { get; set; }
 
-        public Node(bool isWalkable, Vector2 worldPositionCenter, int x, int y) {
-            IsWalkable = isWalkable;
+        public Node(bool isEmpty, Vector2 worldPositionCenter, int x, int y) {
+            IsEmpty = isEmpty;
             _worldPositionCenter = worldPositionCenter;
             X = x;
             Y = y;
-        }
-    }
-
-    class PlatformerNode : Node {
-
-        public int Jump { get; set; }
-        
-        public PlatformerNode(bool isWalkable, Vector2 worldPositionCenter, int x, int y) 
-            : base(isWalkable, worldPositionCenter, x, y) {
         }
     }
 }

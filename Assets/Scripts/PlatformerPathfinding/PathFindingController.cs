@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace PlatformerPathFinding {
-    public class GridController : MonoBehaviour {
+    public class PathFindingController : MonoBehaviour {
         
         [SerializeField] int _gridSizeX;
         [SerializeField] int _gridSizeY;
@@ -11,11 +11,10 @@ namespace PlatformerPathFinding {
         [SerializeField] LayerMask _collisionLayerMask;
 
         Grid _grid;
-        
+        IPathFindingRules _pathFindingRules;
+
         Node _start, _goal;
         List<Node> _path;
-
-        INeighboursProvider _neighboursProvider;
         
         void Start() {
             var gridNodes = new Node[_gridSizeY, _gridSizeX];
@@ -31,18 +30,14 @@ namespace PlatformerPathFinding {
             
             // TODO:
             _grid = new Grid(gridNodes, _gridSizeX, _gridSizeY);
-            _neighboursProvider = new FourSideNeighbours();
+            _pathFindingRules = new PlatformerRules();
         }
                 
         void Update() {
             _start = WorldPositionToNearestNode(GameObject.Find("Begin").transform.position);
             _goal = WorldPositionToNearestNode(GameObject.Find("End").transform.position);
 
-            _path = _grid.Search(_start, _goal, _neighboursProvider, GetManhattanHeuristics);
-        }
-        
-        static int GetManhattanHeuristics(Node node, Node goal) {
-            return Mathf.Abs(node.X - goal.X) + Mathf.Abs(node.Y - goal.Y);
+            _path = _grid.Search(_start, _goal, _pathFindingRules);
         }
 
         void OnDrawGizmos() {
