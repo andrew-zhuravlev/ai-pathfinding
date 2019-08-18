@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
 namespace PlatformerPathFinding {
@@ -16,12 +15,24 @@ namespace PlatformerPathFinding {
             return Mathf.Abs(node.X - goal.X) + Mathf.Abs(node.Y - goal.Y);
         }
 
-        public int GetDistance(Node fromNode, Node toNode) {
-            return 1;
+        public int GetCost(Node fromNode, Node toNode) {
+            int deltaY = toNode.Y - fromNode.Y,
+                deltaX = toNode.X - fromNode.X;
+            // Step to the side.
+            if (deltaY == 0 && (deltaX == -1 || deltaX == 1))
+                return 1;
+            // Performed jump.
+            return _jumpHeight + Mathf.Abs(deltaX) + _jumpHeight - deltaY;
         }
 
         static bool IsGroundedNode(Grid grid, Node node) {
             return !grid.IsEmptyNode(node.Y - 1, node.X);
+        }
+
+        static Node GetFallOnGroundNode(Grid grid, int y, int x) {
+            while (!IsGroundedNode(grid, grid.GetNode(y, x)))
+                --y;
+            return grid.GetNode(y, x);
         }
         
         public IEnumerable<Node> GetNeighbours(Grid grid, Node node) {
@@ -38,11 +49,8 @@ namespace PlatformerPathFinding {
                 
                 // Jump.
                 var isValidJump = true;
-                int curY = node.Y;
-                int curX = node.X;
-                for (int y = 0; y < _jumpHeight; ++y) {
-                    ++curY;
-                    if (!grid.IsEmptyNode(curY, curX)) {
+                for (int y = 1; y <= _jumpHeight; ++y) {
+                    if (!grid.IsEmptyNode(node.Y + y, node.X)) {
                         isValidJump = false;
                         break;
                     }
@@ -50,19 +58,18 @@ namespace PlatformerPathFinding {
 
                 if (isValidJump) {
                     // Right
-                    for (var x = 0; x < _jumpHorizontal; ++x) {
-                        ++curX;
-                        if (!grid.IsEmptyNode(curY, curX)) {
-                            isValidJump = false;
+                    for (var x = 1; x <= _jumpHorizontal; ++x) {
+                        if (!grid.IsEmptyNode(node.Y + _jumpHeight, node.X + x))
                             break;
-                        }
+                        if (x > 1)
+                            neighbours.Add(GetFallOnGroundNode(grid, node.Y + _jumpHeight, node.X + x));
                     }
-
-                    if (isValidJump) {
-                        while (!IsGroundedNode(grid, grid.GetNode(curY, curX)))
-                            --curY;
-
-                        neighbours.Add(grid.GetNode(curY, curX));
+                    // Left
+                    for (var x = -1; x >= -_jumpHorizontal; --x) {
+                        if (!grid.IsEmptyNode(node.Y + _jumpHeight, node.X + x))
+                            break;
+                        if (x < -1)
+                            neighbours.Add(GetFallOnGroundNode(grid, node.Y + _jumpHeight, node.X + x));
                     }
                 }
             }

@@ -32,7 +32,7 @@ namespace PlatformerPathFinding {
                         continue;
 
                     //int newCost = node.GCost + 1;
-                    int newCost = rules.GetDistance(node, neighbour);
+                    int newCost = rules.GetCost(node, neighbour);
                     if (newCost < neighbour.GCost || !openSet.Contains(neighbour)) {
                         neighbour.GCost = newCost;
                         neighbour.HCost = rules.GetHeuristic(neighbour, goal);
