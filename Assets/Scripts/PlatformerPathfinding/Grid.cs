@@ -12,8 +12,12 @@
             _sizeY = sizeY;
         }
 
-        public bool CheckNode(int y, int x) {
+        bool CheckNode(int y, int x) {
             return x >= 0 && y >= 0 && x < _sizeX && y < _sizeY;
+        }
+
+        public bool IsEmptyNode(int y, int x) {
+            return CheckNode(y, x) && GetNode(y, x).IsEmpty;
         }
 
         public Node GetNode(int y, int x) {

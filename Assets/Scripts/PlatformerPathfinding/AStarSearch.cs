@@ -2,9 +2,6 @@ using System.Collections.Generic;
 
 namespace PlatformerPathFinding {
     public static class AStarSearch {
-        
-        public delegate int Heuristics(Node start, Node goal);
-        
         public static List<Node> Search(this Grid grid, Node start, Node goal, IPathFindingRules rules) {
             
             var openSet = new List<Node>();
@@ -34,8 +31,8 @@ namespace PlatformerPathFinding {
                     if (/*!neighbour.IsWalkable ||*/ closedSet.Contains(neighbour))
                         continue;
 
-                    // TODO: Get Distance
-                    int newCost = node.GCost + 1;
+                    //int newCost = node.GCost + 1;
+                    int newCost = rules.GetDistance(node, neighbour);
                     if (newCost < neighbour.GCost || !openSet.Contains(neighbour)) {
                         neighbour.GCost = newCost;
                         neighbour.HCost = rules.GetHeuristic(neighbour, goal);
