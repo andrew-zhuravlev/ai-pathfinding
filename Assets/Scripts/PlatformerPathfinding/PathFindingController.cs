@@ -28,6 +28,8 @@ namespace PlatformerPathFinding {
                 }
             }
             
+            _pathFindingRules = new PlatformerRules(3, 2);
+            
             // TODO:
             _grid = new Grid(gridNodes, _gridSizeX, _gridSizeY);
         }
@@ -35,8 +37,6 @@ namespace PlatformerPathFinding {
         void Update() {
             _start = WorldPositionToNearestNode(GameObject.Find("Begin").transform.position);
             _goal = WorldPositionToNearestNode(GameObject.Find("End").transform.position);
-
-            _pathFindingRules = new PlatformerRules(3, 3, _gridSizeY, _gridSizeX);
             
             _path = _grid.Search(_start, _goal, _pathFindingRules);
         }

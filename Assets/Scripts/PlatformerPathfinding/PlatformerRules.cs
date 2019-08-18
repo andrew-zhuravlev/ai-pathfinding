@@ -1,93 +1,33 @@
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
 namespace PlatformerPathFinding {
     public class PlatformerRules : IPathFindingRules {
 
-        struct JumpState {
-            public int Up;
-            public int Horizontal;
+        readonly int _jumpHeight, _jumpHorizontal;
 
-            public JumpState(int up, int horizontal) {
-                Up = up;
-                Horizontal = horizontal;
-            }
-        }
-        
-        readonly JumpState[,] _jumpGrid;
-        readonly int _jumpHeight, _maxJumpHorizontal;
-
-        public PlatformerRules(int jumpHeight, int maxJumpHorizontal, int gridSizeY, int gridSizeX) {
+        public PlatformerRules(int jumpHeight, int jumpHorizontal) {
             _jumpHeight = jumpHeight;
-            _maxJumpHorizontal = maxJumpHorizontal;
-            
-            _jumpGrid = new JumpState[gridSizeY, gridSizeX];
-            
-            for (var y = 0; y < gridSizeY; ++y)
-                for (var x = 0; x < gridSizeX; ++x)
-                    _jumpGrid[y, x] = new JumpState();
+            _jumpHorizontal = jumpHorizontal;
         }
 
         public int GetHeuristic(Node node, Node goal) {
             return Mathf.Abs(node.X - goal.X) + Mathf.Abs(node.Y - goal.Y);
         }
 
-        public int GetDistance(Node node, Node neighbour) {
+        public int GetDistance(Node fromNode, Node toNode) {
             return 1;
         }
 
+        static bool IsGroundedNode(Grid grid, Node node) {
+            return !grid.IsEmptyNode(node.Y - 1, node.X);
+        }
+        
         public IEnumerable<Node> GetNeighbours(Grid grid, Node node) {
             var neighbours = new List<Node>();
-            
-            JumpState curJump = _jumpGrid[node.Y, node.X];
-            // Still going up ?
-            if (curJump.Up > 0 && curJump.Up < _jumpHeight) {
-                if (grid.IsEmptyNode(node.Y + 1, node.X)) {
-                    neighbours.Add(grid.GetNode(node.Y + 1, node.X));
-                    _jumpGrid[node.Y + 1, node.X].Up = curJump.Up + 1;
-                    
-                }
-                _jumpGrid[node.Y, node.X] = new JumpState();
-                return neighbours;
-            }
-            
-            // Highest point of jump reached.
-            if (curJump.Up == _jumpHeight) {
-                //Left
-                if (grid.IsEmptyNode(node.Y, node.X - 1)) {
-                    neighbours.Add(grid.GetNode(node.Y, node.X - 1));
-                    _jumpGrid[node.Y, node.X - 1].Horizontal = -1;
-                }
-                //Right
-                if (grid.IsEmptyNode(node.Y, node.X + 1)) {
-                    neighbours.Add(grid.GetNode(node.Y, node.X + 1));
-                    _jumpGrid[node.Y, node.X + 1].Horizontal = 1;
-                }
-                _jumpGrid[node.Y, node.X] = new JumpState();
 
-                return neighbours;
-            }
-            
-            if (curJump.Horizontal > 0 && curJump.Horizontal < _maxJumpHorizontal) {
-                if (grid.IsEmptyNode(node.Y, node.X + 1)) {
-                    neighbours.Add(grid.GetNode(node.Y, node.X + 1));
-                    _jumpGrid[node.Y, node.X + 1].Horizontal = curJump.Horizontal + 1;
-                }
-                _jumpGrid[node.Y, node.X] = new JumpState();
-                return neighbours;
-            }
-            
-            if (curJump.Horizontal < 0 && curJump.Horizontal > -_maxJumpHorizontal) {
-                if (grid.IsEmptyNode(node.Y, node.X - 1)) {
-                    neighbours.Add(grid.GetNode(node.Y, node.X - 1));
-                    _jumpGrid[node.Y, node.X - 1].Horizontal = curJump.Horizontal - 1;
-                }
-                _jumpGrid[node.Y, node.X] = new JumpState();
-                return neighbours;
-            }
-            
-            bool isGrounded = !grid.IsEmptyNode(node.Y - 1, node.X);
-
+            bool isGrounded = IsGroundedNode(grid, node);
             if (isGrounded) {
                 // Left
                 if (grid.IsEmptyNode(node.Y, node.X - 1))
@@ -96,20 +36,41 @@ namespace PlatformerPathFinding {
                 if (grid.IsEmptyNode(node.Y, node.X + 1))
                     neighbours.Add(grid.GetNode(node.Y, node.X + 1));
                 
-                // Jump
-                if (grid.IsEmptyNode(node.Y + 1, node.X)) {
-                    neighbours.Add(grid.GetNode(node.Y + 1, node.X));
-                    _jumpGrid[node.Y + 1, node.X].Up = 1;
+                // Jump.
+                var isValidJump = true;
+                int curY = node.Y;
+                int curX = node.X;
+                for (int y = 0; y < _jumpHeight; ++y) {
+                    ++curY;
+                    if (!grid.IsEmptyNode(curY, curX)) {
+                        isValidJump = false;
+                        break;
+                    }
+                }
+
+                if (isValidJump) {
+                    // Right
+                    for (var x = 0; x < _jumpHorizontal; ++x) {
+                        ++curX;
+                        if (!grid.IsEmptyNode(curY, curX)) {
+                            isValidJump = false;
+                            break;
+                        }
+                    }
+
+                    if (isValidJump) {
+                        while (!IsGroundedNode(grid, grid.GetNode(curY, curX)))
+                            --curY;
+
+                        neighbours.Add(grid.GetNode(curY, curX));
+                    }
                 }
             }
-
-            // Falling Down
+            // Falling Down. This should only happen if spawned above the ground.
             else {
                 neighbours.Add(grid.GetNode(node.Y - 1, node.X));
             }
 
-            _jumpGrid[node.Y, node.X] = new JumpState();
-            
             return neighbours;
         }
     }
