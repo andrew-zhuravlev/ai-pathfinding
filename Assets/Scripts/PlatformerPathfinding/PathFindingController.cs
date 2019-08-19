@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace PlatformerPathFinding {
@@ -9,12 +8,12 @@ namespace PlatformerPathFinding {
         [SerializeField] int _gridSizeY;
         [SerializeField] float _cellSize;
         [SerializeField] LayerMask _collisionLayerMask;
+        [SerializeField] bool _drawGrid = true;
 
         Grid _grid;
         IPathFindingRules _pathFindingRules;
 
         Node _start, _goal;
-        List<Node> _path;
         
         void Start() {
             var gridNodes = new Node[_gridSizeY, _gridSizeX];
@@ -28,20 +27,29 @@ namespace PlatformerPathFinding {
                 }
             }
             
-            _pathFindingRules = new PlatformerRules(3, 2);
-            
-            // TODO:
+            _pathFindingRules = new PlatformerRules();
             _grid = new Grid(gridNodes, _gridSizeX, _gridSizeY);
         }
-                
-        void Update() {
-            _start = WorldPositionToNearestNode(GameObject.Find("Begin").transform.position);
-            _goal = WorldPositionToNearestNode(GameObject.Find("End").transform.position);
-            
-            _path = _grid.Search(_start, _goal, _pathFindingRules);
+
+        public List<Vector2> FindPath(PathFindingAgent agent, Transform goalObject) {
+            Node start = WorldPositionToNearestNode(agent.transform.position);
+            Node goal = WorldPositionToNearestNode(goalObject.position);
+
+            var path = _grid.Search(start, goal, _pathFindingRules, agent);
+            if (path == null)
+                return null;
+
+            var pointsPath = new List<Vector2>(path.Count);
+            foreach (Node node in path)
+                pointsPath.Add(node.WorldPositionCenter);
+
+            return pointsPath;
         }
 
         void OnDrawGizmos() {
+            if (!_drawGrid)
+                return;
+            
             Vector2 bottomLeftCell = GetBottomLeftCellCenter();
 
             Vector2 size = Vector2.one * _cellSize;
@@ -50,9 +58,6 @@ namespace PlatformerPathFinding {
                     Vector2 cellCenter = bottomLeftCell + new Vector2(x * _cellSize, y * _cellSize);
 
                     Gizmos.color = IsOccupiedCell(cellCenter) ? Color.red : Color.green;
-
-                    if (_path != null && _path.Any(node => node.X == x && node.Y == y))
-                        Gizmos.color = Color.blue;
 
                     Gizmos.DrawWireCube(cellCenter, size * 0.95f);
                 }

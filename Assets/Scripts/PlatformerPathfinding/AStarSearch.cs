@@ -2,8 +2,10 @@ using System.Collections.Generic;
 
 namespace PlatformerPathFinding {
     public static class AStarSearch {
-        public static List<Node> Search(this Grid grid, Node start, Node goal, IPathFindingRules rules) {
+        public static List<Node> Search(this Grid grid, Node start, Node goal, IPathFindingRules rules,
+            PathFindingAgent agent) {
             
+            // TODO: Use heap.
             var openSet = new List<Node>();
             var closedSet = new HashSet<Node>();
             openSet.Add(start);
@@ -27,15 +29,15 @@ namespace PlatformerPathFinding {
                     break;                    
                 }
 
-                foreach (Node neighbour in rules.GetNeighbours(grid, node)) {
+                foreach (Node neighbour in rules.GetNeighbours(grid, node, agent)) {
                     if (/*!neighbour.IsWalkable ||*/ closedSet.Contains(neighbour))
                         continue;
 
                     //int newCost = node.GCost + 1;
-                    int newCost = rules.GetCost(node, neighbour);
+                    int newCost = rules.GetCost(node, neighbour, agent);
                     if (newCost < neighbour.GCost || !openSet.Contains(neighbour)) {
                         neighbour.GCost = newCost;
-                        neighbour.HCost = rules.GetHeuristic(neighbour, goal);
+                        neighbour.HCost = rules.GetHeuristic(neighbour, goal, agent);
                         neighbour.Parent = node;
 
                         if (!openSet.Contains(neighbour))
@@ -47,6 +49,7 @@ namespace PlatformerPathFinding {
             return foundGoal ? RetracePath(goal) : null;
         }
 
+        // TODO: Capacity via Parent: counter.
         static List<Node> RetracePath(Node goal) {
             var result = new List<Node> { goal };
             var currentNode = goal.Parent;

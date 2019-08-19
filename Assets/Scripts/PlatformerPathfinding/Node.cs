@@ -3,7 +3,7 @@ using UnityEngine;
 namespace PlatformerPathFinding {
     public class Node {
         public bool IsEmpty { get; }
-        Vector2 _worldPositionCenter;
+        public Vector2 WorldPositionCenter { get; private set; }
 
         public int Y { get; }
         public int X { get; }
@@ -21,7 +21,7 @@ namespace PlatformerPathFinding {
 
         public Node(bool isEmpty, Vector2 worldPositionCenter, int x, int y) {
             IsEmpty = isEmpty;
-            _worldPositionCenter = worldPositionCenter;
+            WorldPositionCenter = worldPositionCenter;
             X = x;
             Y = y;
         }
