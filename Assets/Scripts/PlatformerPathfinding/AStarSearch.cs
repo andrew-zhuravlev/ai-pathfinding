@@ -5,23 +5,14 @@ namespace PlatformerPathFinding {
         public static List<Node> Search(this Grid grid, Node start, Node goal, IPathFindingRules rules,
             PathFindingAgent agent) {
             
-            // TODO: Use heap.
-            var openSet = new List<Node>();
+            var openSet = new Heap<Node>(grid.MaxSize);
             var closedSet = new HashSet<Node>();
             openSet.Add(start);
             var foundGoal = false;
 
             while (openSet.Count > 0) {
                 // Get the node with lowest FCost
-                Node node = openSet[0];
-                for (var i = 1; i < openSet.Count; i ++) {
-                    if (openSet[i].FCost < node.FCost || openSet[i].FCost == node.FCost) {
-                        if (openSet[i].HCost < node.HCost)
-                            node = openSet[i];
-                    }
-                }
-
-                openSet.Remove(node);
+                Node node = openSet.RemoveFirst();
                 closedSet.Add(node);
 
                 if (node == goal) {

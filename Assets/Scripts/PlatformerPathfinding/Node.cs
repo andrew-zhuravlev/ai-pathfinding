@@ -1,9 +1,9 @@
 using UnityEngine;
 
 namespace PlatformerPathFinding {
-    public class Node {
+    public class Node : IHeapItem<Node> {
         public bool IsEmpty { get; }
-        public Vector2 WorldPositionCenter { get; private set; }
+        public Vector2 WorldPositionCenter { get; }
 
         public int Y { get; }
         public int X { get; }
@@ -24,6 +24,15 @@ namespace PlatformerPathFinding {
             WorldPositionCenter = worldPositionCenter;
             X = x;
             Y = y;
+        }
+
+        public int HeapIndex { get; set; }
+        public int CompareTo(Node nodeToCompare) {
+            int compare = FCost.CompareTo(nodeToCompare.FCost);
+            if (compare == 0) {
+                compare = HCost.CompareTo(nodeToCompare.HCost);
+            }
+            return -compare;
         }
     }
 }

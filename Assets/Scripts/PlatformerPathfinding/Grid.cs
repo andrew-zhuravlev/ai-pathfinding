@@ -11,6 +11,8 @@
             _sizeX = sizeX;
             _sizeY = sizeY;
         }
+        
+        public int MaxSize => _sizeX * _sizeY;
 
         bool CheckNode(int y, int x) {
             return x >= 0 && y >= 0 && x < _sizeX && y < _sizeY;

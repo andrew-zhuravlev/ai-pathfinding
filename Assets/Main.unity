@@ -2126,7 +2126,7 @@ MonoBehaviour:
   _collisionLayerMask:
     serializedVersion: 2
     m_Bits: 768
-  _drawGrid: 1
+  _drawGrid: 0
 --- !u!1001 &482681399
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4003,10 +4003,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1179676313}
     m_Modifications:
-    - target: {fileID: 1715332128816764, guid: ad8aee53221f9c44bb741edfa9bbafe3, type: 3}
-      propertyPath: m_Name
-      value: Medieval_props_free_16 (1)
-      objectReference: {fileID: 0}
     - target: {fileID: 4766830615410442, guid: ad8aee53221f9c44bb741edfa9bbafe3, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.528
@@ -4049,6 +4045,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+    - target: {fileID: 1715332128816764, guid: ad8aee53221f9c44bb741edfa9bbafe3, type: 3}
+      propertyPath: m_Name
+      value: Medieval_props_free_16 (1)
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ad8aee53221f9c44bb741edfa9bbafe3, type: 3}
 --- !u!4 &1196800841 stripped
@@ -4182,20 +4182,15 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 878415819916089657, guid: 9011788ce9ee6674da2578368698c754,
-        type: 3}
-      propertyPath: m_Name
-      value: Goal
-      objectReference: {fileID: 0}
     - target: {fileID: 878415819916089660, guid: 9011788ce9ee6674da2578368698c754,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.39
+      value: -12.18
       objectReference: {fileID: 0}
     - target: {fileID: 878415819916089660, guid: 9011788ce9ee6674da2578368698c754,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.635
+      value: 0.33
       objectReference: {fileID: 0}
     - target: {fileID: 878415819916089660, guid: 9011788ce9ee6674da2578368698c754,
         type: 3}
@@ -4252,6 +4247,11 @@ PrefabInstance:
       propertyPath: m_LocalScale.y
       value: 2.7
       objectReference: {fileID: 0}
+    - target: {fileID: 878415819916089657, guid: 9011788ce9ee6674da2578368698c754,
+        type: 3}
+      propertyPath: m_Name
+      value: Goal
+      objectReference: {fileID: 0}
     - target: {fileID: 878415819916089662, guid: 9011788ce9ee6674da2578368698c754,
         type: 3}
       propertyPath: m_BodyType
@@ -4266,10 +4266,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1179676313}
     m_Modifications:
-    - target: {fileID: 1208099736938186, guid: bff18508c0a59f948ac193210aa13f92, type: 3}
-      propertyPath: m_Name
-      value: Medieval_props_free_8 (1)
-      objectReference: {fileID: 0}
     - target: {fileID: 4692129473507630, guid: bff18508c0a59f948ac193210aa13f92, type: 3}
       propertyPath: m_LocalPosition.x
       value: -7.749
@@ -4312,6 +4308,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+    - target: {fileID: 1208099736938186, guid: bff18508c0a59f948ac193210aa13f92, type: 3}
+      propertyPath: m_Name
+      value: Medieval_props_free_8 (1)
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bff18508c0a59f948ac193210aa13f92, type: 3}
 --- !u!4 &1402180951 stripped
@@ -4565,10 +4565,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1179676313}
     m_Modifications:
-    - target: {fileID: 1226778788418928, guid: 71cce0e18cda5cf41922fd12f108ed51, type: 3}
-      propertyPath: m_Name
-      value: Medieval_props_free_21 (1)
-      objectReference: {fileID: 0}
     - target: {fileID: 4961243305158150, guid: 71cce0e18cda5cf41922fd12f108ed51, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5.161
@@ -4611,6 +4607,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+    - target: {fileID: 1226778788418928, guid: 71cce0e18cda5cf41922fd12f108ed51, type: 3}
+      propertyPath: m_Name
+      value: Medieval_props_free_21 (1)
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 71cce0e18cda5cf41922fd12f108ed51, type: 3}
 --- !u!4 &1707264434 stripped
