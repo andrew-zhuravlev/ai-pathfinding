@@ -2,10 +2,10 @@ using System.Collections.Generic;
 
 namespace PlatformerPathFinding {
     public static class AStarSearch {
-        public static List<Node> Search(this Grid grid, Node start, Node goal, IPathFindingRules rules,
-            PathFindingAgent agent) {
+        public static List<Node> Search(this PathFindingController pathFindingController, Node start, Node goal, 
+            IPathFindingRules rules, PathFindingAgent agent) {
             
-            var openSet = new Heap<Node>(grid.MaxSize);
+            var openSet = new Heap<Node>(pathFindingController.Grid.MaxSize);
             var closedSet = new HashSet<Node>();
             openSet.Add(start);
             var foundGoal = false;
@@ -20,7 +20,7 @@ namespace PlatformerPathFinding {
                     break;                    
                 }
 
-                foreach (Node neighbour in rules.GetNeighbours(grid, node, agent)) {
+                foreach (Node neighbour in rules.GetNeighbours(pathFindingController, node, agent)) {
                     if (/*!neighbour.IsWalkable ||*/ closedSet.Contains(neighbour))
                         continue;
 

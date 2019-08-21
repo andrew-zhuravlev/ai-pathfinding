@@ -13,6 +13,9 @@ public class PathFindingAgent : MonoBehaviour {
     public int JumpHeight => _jumpHeight;
     public int JumpHorizontal => _jumpHorizontal;
 
+    public int Height => _height;
+    public int Width => _width;
+
     List<Vector2> _path;
     
     void Update() {
@@ -23,7 +26,7 @@ public class PathFindingAgent : MonoBehaviour {
         if (_path == null)
             return;
         for (int i = 0; i < _path.Count - 1; i++) {
-            Gizmos.color = Color.blue;
+            Gizmos.color = Gizmos.color == Color.blue ? Color.magenta : Color.blue;
             Gizmos.DrawLine(_path[i], _path[i + 1]);
         }
     }

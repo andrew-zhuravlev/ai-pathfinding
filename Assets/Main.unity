@@ -2126,7 +2126,7 @@ MonoBehaviour:
   _collisionLayerMask:
     serializedVersion: 2
     m_Bits: 768
-  _drawGrid: 0
+  _drawGrid: 1
 --- !u!1001 &482681399
 PrefabInstance:
   m_ObjectHideFlags: 0

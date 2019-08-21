@@ -1,15 +1,18 @@
-﻿namespace PlatformerPathFinding {
-    
+﻿
+namespace PlatformerPathFinding {
     public class Grid {
         readonly Node[,] _grid;
         readonly int _sizeX;
         readonly int _sizeY;
 
-        // Detects if node x and y is correct and it is walkable.
-        public Grid(Node[,] grid, int sizeX, int sizeY) {
+        public float CellSize { get; }
+
+        // Detects if node x and y exists and it's walkable.
+        public Grid(Node[,] grid, int sizeX, int sizeY, float cellSize) {
             _grid = grid;
             _sizeX = sizeX;
             _sizeY = sizeY;
+            CellSize = cellSize;
         }
         
         public int MaxSize => _sizeX * _sizeY;

@@ -10,11 +10,12 @@ namespace PlatformerPathFinding {
         [SerializeField] LayerMask _collisionLayerMask;
         [SerializeField] bool _drawGrid = true;
 
-        Grid _grid;
         IPathFindingRules _pathFindingRules;
 
         Node _start, _goal;
-        
+
+        public Grid Grid { get; private set; }
+
         void Start() {
             var gridNodes = new Node[_gridSizeY, _gridSizeX];
 
@@ -28,14 +29,15 @@ namespace PlatformerPathFinding {
             }
             
             _pathFindingRules = new PlatformerRules();
-            _grid = new Grid(gridNodes, _gridSizeX, _gridSizeY);
+            Grid = new Grid(gridNodes, _gridSizeX, _gridSizeY, _cellSize);
         }
 
         public List<Vector2> FindPath(PathFindingAgent agent, Transform goalObject) {
-            Node start = WorldPositionToNearestNode(agent.transform.position);
-            Node goal = WorldPositionToNearestNode(goalObject.position);
+            // TODO: Refactor.
+            Node start = WorldPositionToNode(agent.transform.position);
+            Node goal = WorldPositionToNode(goalObject.position);
 
-            var path = _grid.Search(start, goal, _pathFindingRules, agent);
+            var path = this.Search(start, goal, _pathFindingRules, agent);
             if (path == null)
                 return null;
 
@@ -64,23 +66,33 @@ namespace PlatformerPathFinding {
             }
         }
         
-        Vector2 GetBottomLeftCellCenter() {
-            var gridCenter = (Vector2) transform.position;
-            return new Vector2(gridCenter.x - (_gridSizeX / 2f - .5f) * _cellSize,
-                gridCenter.y - (_gridSizeY / 2f - .5f) * _cellSize);
-        }
-        
         bool IsOccupiedCell(Vector2 worldPos) {
             return Physics2D.OverlapBox(worldPos, new Vector2(_cellSize, _cellSize) - Vector2.one * 0.05f, 0,
                 _collisionLayerMask);
         }
-        
-        Node WorldPositionToNearestNode(Vector2 worldPos) {
+               
+        // TODO Optimize: without GetBottomLeftCellCenter.
+        public Node WorldPositionToNode(Vector2 worldPos) {
             Vector2 bottomLeftCell = GetBottomLeftCellCenter();
             int x = Mathf.Clamp(Mathf.RoundToInt((worldPos.x - bottomLeftCell.x) / _cellSize), 0, _gridSizeX - 1),
                 y = Mathf.Clamp(Mathf.RoundToInt((worldPos.y - bottomLeftCell.y) / _cellSize), 0, _gridSizeY - 1);
 
-            return _grid.GetNode(y, x);
+            return Grid.GetNode(y, x);
+        }
+
+        // TODO: Two nearly identical methods.
+        public Vector2Int WorldPositionToNodeXY(Vector2 worldPos) {
+            Vector2 bottomLeftCell = GetBottomLeftCellCenter();
+            int x = Mathf.Clamp(Mathf.RoundToInt((worldPos.x - bottomLeftCell.x) / _cellSize), 0, _gridSizeX - 1),
+                y = Mathf.Clamp(Mathf.RoundToInt((worldPos.y - bottomLeftCell.y) / _cellSize), 0, _gridSizeY - 1);
+            
+            return new Vector2Int(x, y);
+        }
+               
+        Vector2 GetBottomLeftCellCenter() {
+            var gridCenter = (Vector2) transform.position;
+            return new Vector2(gridCenter.x - (_gridSizeX / 2f - .5f) * _cellSize,
+                gridCenter.y - (_gridSizeY / 2f - .5f) * _cellSize);
         }
     }
 }
