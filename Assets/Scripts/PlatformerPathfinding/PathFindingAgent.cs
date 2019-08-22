@@ -3,7 +3,7 @@ using PlatformerPathFinding;
 using UnityEngine;
 
 public class PathFindingAgent : MonoBehaviour {
-    [SerializeField] PathFindingController _pathFindingController;
+    [SerializeField] PathFindingGrid _pathFindingGrid;
     [SerializeField] Transform _goalObject;
     [SerializeField] int _height;
     [SerializeField] int _width;
@@ -19,7 +19,7 @@ public class PathFindingAgent : MonoBehaviour {
     List<Vector2> _path;
     
     void Update() {
-        _path = _pathFindingController.FindPath(this, _goalObject);
+        _path = _pathFindingGrid.FindPath(this, _goalObject);
     }
 
     void OnDrawGizmos() {

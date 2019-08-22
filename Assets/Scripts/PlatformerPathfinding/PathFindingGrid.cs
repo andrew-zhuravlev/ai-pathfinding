@@ -2,7 +2,7 @@
 using UnityEngine;
 
 namespace PlatformerPathFinding {
-    public class PathFindingController : MonoBehaviour {
+    public class PathFindingGrid : MonoBehaviour {
         
         [SerializeField] int _gridSizeX;
         [SerializeField] int _gridSizeY;
@@ -12,24 +12,39 @@ namespace PlatformerPathFinding {
 
         IPathFindingRules _pathFindingRules;
 
+        Node[,] _grid;
         Node _start, _goal;
 
-        public Grid Grid { get; private set; }
+        public float CellSize => _cellSize;
+
+        public int MaxSize => _gridSizeX * _gridSizeY;
+
+        bool CheckNode(int y, int x) {
+            return x >= 0 && y >= 0 && x < _gridSizeX && y < _gridSizeY;
+        }
+
+        public bool IsEmptyNode(int y, int x) {
+            return CheckNode(y, x) && GetNode(y, x).IsEmpty;
+        }
+
+        public Node GetNode(int y, int x) {
+            return _grid[y, x];
+        }
+        
 
         void Start() {
-            var gridNodes = new Node[_gridSizeY, _gridSizeX];
+            _grid = new Node[_gridSizeY, _gridSizeX];
 
             Vector2 bottomLeftCell = GetBottomLeftCellCenter();
             for (var y = 0; y < _gridSizeY; ++y) {
                 for (var x = 0; x < _gridSizeX; ++x) {
                     Vector2 cellCenter = bottomLeftCell + new Vector2(x * _cellSize, y * _cellSize);
                     bool isOccupiedCell = IsOccupiedCell(cellCenter);
-                    gridNodes[y, x] = new Node(!isOccupiedCell, cellCenter, x, y);
+                    _grid[y, x] = new Node(!isOccupiedCell, cellCenter, x, y);
                 }
             }
             
             _pathFindingRules = new PlatformerRules();
-            Grid = new Grid(gridNodes, _gridSizeX, _gridSizeY, _cellSize);
         }
 
         public List<Vector2> FindPath(PathFindingAgent agent, Transform goalObject) {
@@ -77,7 +92,7 @@ namespace PlatformerPathFinding {
             int x = Mathf.Clamp(Mathf.RoundToInt((worldPos.x - bottomLeftCell.x) / _cellSize), 0, _gridSizeX - 1),
                 y = Mathf.Clamp(Mathf.RoundToInt((worldPos.y - bottomLeftCell.y) / _cellSize), 0, _gridSizeY - 1);
 
-            return Grid.GetNode(y, x);
+            return GetNode(y, x);
         }
 
         // TODO: Two nearly identical methods.

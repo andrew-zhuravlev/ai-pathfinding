@@ -2,16 +2,15 @@ using System.Collections.Generic;
 
 namespace PlatformerPathFinding {
     public static class AStarSearch {
-        public static List<Node> Search(this PathFindingController pathFindingController, Node start, Node goal, 
+        public static List<Node> Search(this PathFindingGrid pathFindingGrid, Node start, Node goal, 
             IPathFindingRules rules, PathFindingAgent agent) {
             
-            var openSet = new Heap<Node>(pathFindingController.Grid.MaxSize);
+            var openSet = new Heap<Node>(pathFindingGrid.MaxSize);
             var closedSet = new HashSet<Node>();
             openSet.Add(start);
             var foundGoal = false;
 
             while (openSet.Count > 0) {
-                // Get the node with lowest FCost
                 Node node = openSet.RemoveFirst();
                 closedSet.Add(node);
 
@@ -20,11 +19,10 @@ namespace PlatformerPathFinding {
                     break;                    
                 }
 
-                foreach (Node neighbour in rules.GetNeighbours(pathFindingController, node, agent)) {
+                foreach (Node neighbour in rules.GetNeighbours(pathFindingGrid, node, agent)) {
                     if (/*!neighbour.IsWalkable ||*/ closedSet.Contains(neighbour))
                         continue;
 
-                    //int newCost = node.GCost + 1;
                     int newCost = rules.GetCost(node, neighbour, agent);
                     if (newCost < neighbour.GCost || !openSet.Contains(neighbour)) {
                         neighbour.GCost = newCost;

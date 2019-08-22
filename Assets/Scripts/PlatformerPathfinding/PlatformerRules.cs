@@ -34,8 +34,7 @@ namespace PlatformerPathFinding {
             }
         }
 
-        public IEnumerable<Node> GetNeighbours(PathFindingController pathFindingController, Node node, 
-            PathFindingAgent agent) {
+        public IEnumerable<Node> GetNeighbours(PathFindingGrid pathFindingGrid, Node node, PathFindingAgent agent) {
             var neighbours = new List<Node>();
 
             var jumpHeight = agent.JumpHeight;
@@ -43,8 +42,6 @@ namespace PlatformerPathFinding {
 
             var height = agent.Height;
             var width = agent.Width;
-
-            var grid = pathFindingController.Grid;
             
             bool isGrounded = IsGroundedNode(grid, node);
             if (isGrounded) {
@@ -76,7 +73,7 @@ namespace PlatformerPathFinding {
                     if (jumpEnd == null)
                         continue;
                     
-                    if(CheckTrajectory(pathFindingController, node, jumpEnd, jumpHeight, height, width, x))
+                    if(CheckTrajectory(pathFindingGrid, node, jumpEnd, jumpHeight, height, width, x))
                         neighbours.Add(jumpEnd);
                 }
 
@@ -88,7 +85,7 @@ namespace PlatformerPathFinding {
                     if (jumpEnd == null)
                         continue;
                     
-                    if(CheckTrajectory(pathFindingController, node, jumpEnd, jumpHeight, height, width, x))
+                    if(CheckTrajectory(pathFindingGrid, node, jumpEnd, jumpHeight, height, width, x))
                     neighbours.Add(jumpEnd);
                 }
             }
@@ -100,13 +97,13 @@ namespace PlatformerPathFinding {
         }
 
         // TODO: Refactor input parameters.
-        static bool CheckTrajectory(PathFindingController pathFindingController, Node jumpStart, Node jumpEnd, 
+        static bool CheckTrajectory(PathFindingGrid pathFindingGrid, Node jumpStart, Node jumpEnd, 
             int jumpHeight, int agentHeight, int agentWidth, int xDelta) {
             
             Vector2 p0 = jumpStart.WorldPositionCenter;
-            Vector2 p1 = p0 + Vector2.up * jumpHeight * pathFindingController.Grid.CellSize;
-            Vector2 p2 = p1 + Vector2.right * (xDelta / 2f) * pathFindingController.Grid.CellSize;
-            Vector2 p3 = p2 + Vector2.right * (xDelta / 2f) * pathFindingController.Grid.CellSize;
+            Vector2 p1 = p0 + Vector2.up * jumpHeight * pathFindingGrid.CellSize;
+            Vector2 p2 = p1 + Vector2.right * (xDelta / 2f) * pathFindingGrid.CellSize;
+            Vector2 p3 = p2 + Vector2.right * (xDelta / 2f) * pathFindingGrid.CellSize;
             Vector2 p4 = jumpEnd.WorldPositionCenter;
 
             // TODO: Number of points instead of offset. For now its easier.
@@ -114,16 +111,16 @@ namespace PlatformerPathFinding {
             for (float t = offset; t < 1; t += offset) {
                 var curveDot = QuadraticCurve(p0, p1, p2, t);
                 // TODO: it should be optimized
-                Vector2Int nodeXyWorld = pathFindingController.WorldPositionToNodeXY(curveDot);
-                if (!pathFindingController.Grid.IsEmptyNode(nodeXyWorld.y, nodeXyWorld.x))
+                Vector2Int nodeXyWorld = pathFindingGrid.WorldPositionToNodeXY(curveDot);
+                if (!pathFindingGrid.IsEmptyNode(nodeXyWorld.y, nodeXyWorld.x))
                     return false;
             }
             
             for (float t = offset; t < 1; t += offset) {
                 var curveDot = QuadraticCurve(p2, p3, p4, t);
                 // TODO: it should be optimized
-                Vector2Int nodeXyWorld = pathFindingController.WorldPositionToNodeXY(curveDot);
-                if (!pathFindingController.Grid.IsEmptyNode(nodeXyWorld.y, nodeXyWorld.x))
+                Vector2Int nodeXyWorld = pathFindingGrid.WorldPositionToNodeXY(curveDot);
+                if (!pathFindingGrid.IsEmptyNode(nodeXyWorld.y, nodeXyWorld.x))
                     return false;
             }
 
