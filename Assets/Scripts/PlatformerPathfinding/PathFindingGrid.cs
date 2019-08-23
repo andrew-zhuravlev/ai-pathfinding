@@ -44,20 +44,11 @@ namespace PlatformerPathFinding {
             _search = new AStarSearch(this);
         }
 
-        public List<Vector2> FindPath(PathFindingAgent agent, Transform goalObject) {
-            // TODO: Refactor.
+        public List<Node> FindPath(PathFindingAgent agent, Transform goalObject) {
             Node start = WorldPositionToNode(agent.transform.position);
             Node goal = WorldPositionToNode(goalObject.position);
 
-            var path = _search.Search(start, goal, _pathFindingRules, agent);
-            if (path == null)
-                return null;
-
-            var pointsPath = new List<Vector2>(path.Count);
-            foreach (Node node in path)
-                pointsPath.Add(node.WorldPosition);
-
-            return pointsPath;
+            return _search.Search(start, goal, _pathFindingRules, agent);
         }
 
         void OnDrawGizmos() {

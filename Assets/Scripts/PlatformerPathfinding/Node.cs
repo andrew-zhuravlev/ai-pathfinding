@@ -2,7 +2,8 @@ using UnityEngine;
 
 namespace PlatformerPathFinding {
 
-    enum TransitionType {
+    public enum TransitionType {
+        None,
         Walk,
         Jump
     }
@@ -24,17 +25,18 @@ namespace PlatformerPathFinding {
         int FCost => GCost + HCost;
 
         public Node Parent { get; set; }
-
-        /// <summary>
-        /// The transition type from parent to this node.
-        /// </summary>
-        TransitionType TransitionType { get; set; }
-
+        
         public Node(bool isEmpty, Vector2 worldPosition, int x, int y) {
             IsEmpty = isEmpty;
             WorldPosition = worldPosition;
             X = x;
             Y = y;
+        }
+
+        public static bool IsWalkTransition(Node fromNode, Node toNode) {
+            int deltaY = toNode.Y - fromNode.Y,
+                deltaX = toNode.X - fromNode.X;
+            return deltaY == 0 && (deltaX == -1 || deltaX == 1);
         }
 
         public int HeapIndex { get; set; }

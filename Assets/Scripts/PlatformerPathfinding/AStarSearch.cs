@@ -13,8 +13,7 @@ namespace PlatformerPathFinding {
             _openSet = new Heap<Node>(pathFindingGrid.MaxSize);
         }
         
-        public List<Node> Search(Node start, Node goal, IPathFindingRules rules, 
-            PathFindingAgent agent) {
+        public List<Node> Search(Node start, Node goal, IPathFindingRules rules, PathFindingAgent agent) {
             
             _openSet.Clear();
             _closedSet.Clear();
@@ -55,10 +54,21 @@ namespace PlatformerPathFinding {
         static List<Node> RetracePath(Node start, Node goal) {
             var path = new List<Node>();
             Node currentNode = goal;
+
+            bool isPreviousWalk = false;
+            
             while (currentNode != start) {
-                path.Add(currentNode);
-                currentNode = currentNode.Parent;
+
+                Node parent = currentNode.Parent;
+                bool isCurrentWalk = Node.IsWalkTransition(parent, currentNode);
+
+                if (!(isPreviousWalk && isCurrentWalk))
+                    path.Add(currentNode);
+
+                isPreviousWalk = isCurrentWalk;
+                currentNode = parent;
             }
+            
             path.Reverse();
             return path;
         }
