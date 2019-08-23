@@ -23,8 +23,10 @@ public class PathFindingAgent : MonoBehaviour {
     }
 
     void OnDrawGizmos() {
-        if (_path == null)
+        if (_path == null || _path.Count == 0)
             return;
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(transform.position, _path[0]);
         for (int i = 0; i < _path.Count - 1; i++) {
             Gizmos.color = Gizmos.color == Color.blue ? Color.magenta : Color.blue;
             Gizmos.DrawLine(_path[i], _path[i + 1]);

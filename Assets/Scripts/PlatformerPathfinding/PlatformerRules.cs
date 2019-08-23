@@ -4,11 +4,20 @@ using UnityEngine;
 
 namespace PlatformerPathFinding {
     public class PlatformerRules : IPathFindingRules {
+        
+        static readonly Func<Node, bool> IsGround = n => n == null || !n.IsEmpty;
+        static readonly Func<Node, bool> IsAir = n => n != null && n.IsEmpty;
+        
+        
         public int GetHeuristic(Node node, Node goal, PathFindingAgent agent) {
             return Mathf.Abs(node.X - goal.X) + Mathf.Abs(node.Y - goal.Y);
         }
 
         public int GetCost(Node fromNode, Node toNode, PathFindingAgent agent) {
+            
+            //todo remove 
+            return 1;
+            
             int deltaY = toNode.Y - fromNode.Y,
                 deltaX = toNode.X - fromNode.X;
             // Step to the side.
@@ -18,76 +27,40 @@ namespace PlatformerPathFinding {
             return agent.JumpHeight + Mathf.Abs(deltaX) + agent.JumpHeight - deltaY;
         }
 
-        static bool IsGroundedNode(Grid grid, Node node) {
-            return !grid.IsEmptyNode(node.Y - 1, node.X);
-        }
-
-        // TODO: IT uses try catch, RAFACTOR!
-        static Node GetFallOnGroundNode(Grid grid, int y, int x) {
-            try {
-                while (!IsGroundedNode(grid, grid.GetNode(y, x)))
-                    --y;
-                return grid.GetNode(y, x);
-            }
-            catch (Exception e) {
-                return null;
-            }
-        }
-
-        public IEnumerable<Node> GetNeighbours(PathFindingGrid pathFindingGrid, Node node, PathFindingAgent agent) {
+        public IEnumerable<Node> GetNeighbours(PathFindingGrid grid, Node node, PathFindingAgent agent) {
             var neighbours = new List<Node>();
 
-            var jumpHeight = agent.JumpHeight;
-            var jumpHorizontal = agent.JumpHorizontal;
-
-            var height = agent.Height;
-            var width = agent.Width;
-            
-            bool isGrounded = IsGroundedNode(grid, node);
+            // TODO: It is always grounded, no need to check it unless it is spawned up.
+            bool isGrounded = AnyNode(grid, node.Y - 1, node.X, 1, agent.Width, IsGround);
             if (isGrounded) {
-                // Left
-                bool isLeft = true;
-                for (int y = 0; y < height; y++) {
-                    if (!grid.IsEmptyNode(node.Y + y, node.X - 1))
-                        isLeft = false;
-                }
-                if (isLeft)
+
+                 
+                if (AllNodes(grid, node.Y, node.X - 1, agent.Height, 1, IsAir))
                     neighbours.Add(grid.GetNode(node.Y, node.X - 1));
                 
-                
-                // Right
-                bool isRight = true;
-                for (int y = 0; y < height; y++) {
-                    if (!grid.IsEmptyNode(node.Y + y, node.X + width))
-                        isRight = false;
-                }
-                if (isRight)
-                    neighbours.Add(grid.GetNode(node.Y, node.X + width));
+                if (AllNodes(grid, node.Y, node.X + agent.Width, agent.Height, 1, IsAir))
+                    neighbours.Add(grid.GetNode(node.Y, node.X + agent.Width));
 
                 
                 // Jump to the Right
-                for (var x = 2; x <= jumpHorizontal; ++x) {
-                    Node jumpEnd = GetFallOnGroundNode(grid, node.Y + jumpHeight, node.X + x);
-                    
-                    //TODO: REFACTOR.
-                    if (jumpEnd == null)
+                for (var x = 2; x <= agent.JumpHorizontal; ++x) {
+                    var jumpLanding = GetFallOnGroundNode(grid, node.Y + agent.JumpHeight, node.X + x, agent.Width);
+                    if (jumpLanding == null)
                         continue;
                     
-                    if(CheckTrajectory(pathFindingGrid, node, jumpEnd, jumpHeight, height, width, x))
-                        neighbours.Add(jumpEnd);
+                    if (CheckTrajectory(grid, agent, node, jumpLanding, x))
+                        neighbours.Add(jumpLanding);
                 }
-
+                
                 // Jump to the Left
-                for (var x = -2; x >= -jumpHorizontal; --x) {
-                    Node jumpEnd = GetFallOnGroundNode(grid, node.Y + jumpHeight, node.X + x);
-                    
-                    //TODO: REFACTOR.
-                    if (jumpEnd == null)
-                        continue;
-                    
-                    if(CheckTrajectory(pathFindingGrid, node, jumpEnd, jumpHeight, height, width, x))
-                    neighbours.Add(jumpEnd);
-                }
+//                for (var x = -2; x >= -agent.JumpHorizontal; --x) {
+//                    var jumpLanding = GetFallOnGroundNode(grid, node.Y + agent.JumpHeight, node.X + x, agent.Width);
+//                    if (jumpLanding == null)
+//                        continue;
+//                    
+//                    if (CheckTrajectory(grid, agent, node, jumpLanding, x))
+//                        neighbours.Add(jumpLanding);
+//                }
             }
             // Falling Down. This should only happen if spawned above the ground.
             else
@@ -96,41 +69,66 @@ namespace PlatformerPathFinding {
             return neighbours;
         }
 
-        // TODO: Refactor input parameters.
-        static bool CheckTrajectory(PathFindingGrid pathFindingGrid, Node jumpStart, Node jumpEnd, 
-            int jumpHeight, int agentHeight, int agentWidth, int xDelta) {
-            
-            Vector2 p0 = jumpStart.WorldPositionCenter;
-            Vector2 p1 = p0 + Vector2.up * jumpHeight * pathFindingGrid.CellSize;
-            Vector2 p2 = p1 + Vector2.right * (xDelta / 2f) * pathFindingGrid.CellSize;
-            Vector2 p3 = p2 + Vector2.right * (xDelta / 2f) * pathFindingGrid.CellSize;
-            Vector2 p4 = jumpEnd.WorldPositionCenter;
+        /// <summary>
+        /// Checks if all nodes in the square satisfy condition.
+        /// </summary>
+        /// <param name="grid">Grid</param>
+        /// <param name="yStart"></param>
+        /// <param name="xStart"></param>
+        /// <param name="yCount">Should be greater than zero.</param>
+        /// <param name="xCount">Should be greater than zero.</param>
+        /// <param name="checkFunc">Function should return true, if satisfies.</param>
+        /// <returns>True if all nodes satisfy condition.</returns>
+        static bool AllNodes(PathFindingGrid grid, int yStart, int xStart, int yCount, int xCount,
+            Func<Node, bool> checkFunc) {
 
-            // TODO: Number of points instead of offset. For now its easier.
-            const float offset = 0.1f;
-            for (float t = offset; t < 1; t += offset) {
-                var curveDot = QuadraticCurve(p0, p1, p2, t);
-                // TODO: it should be optimized
-                Vector2Int nodeXyWorld = pathFindingGrid.WorldPositionToNodeXY(curveDot);
-                if (!pathFindingGrid.IsEmptyNode(nodeXyWorld.y, nodeXyWorld.x))
-                    return false;
-            }
-            
-            for (float t = offset; t < 1; t += offset) {
-                var curveDot = QuadraticCurve(p2, p3, p4, t);
-                // TODO: it should be optimized
-                Vector2Int nodeXyWorld = pathFindingGrid.WorldPositionToNodeXY(curveDot);
-                if (!pathFindingGrid.IsEmptyNode(nodeXyWorld.y, nodeXyWorld.x))
-                    return false;
+            for (int y = 0; y < yCount; y++) {
+                for (int x = 0; x < xCount; x++)
+                    if (!checkFunc(grid.GetNode(yStart + y, xStart + x)))
+                        return false;
             }
 
             return true;
         }
 
-        static Vector2 QuadraticCurve(Vector2 a, Vector2 b, Vector3 c, float t) {
-            Vector2 p0 = Vector2.Lerp(a, b, t);
-            Vector2 p1 = Vector2.Lerp(b, c, t);
-            return Vector2.Lerp(p0, p1, t);
+        /// <summary>
+        /// Checks if any node satisfies condition.
+        /// </summary>
+        /// <param name="grid"></param>
+        /// <param name="yStart"></param>
+        /// <param name="xStart"></param>
+        /// <param name="yCount"></param>
+        /// <param name="xCount"></param>
+        /// <param name="checkFunc"></param>
+        /// <returns>True if any node satisfies condition.</returns>
+        static bool AnyNode(PathFindingGrid grid, int yStart, int xStart, int yCount, int xCount,
+            Func<Node, bool> checkFunc) {
+            
+            for (int y = 0; y < yCount; y++) {
+                for (int x = 0; x < xCount; x++)
+                    if (checkFunc(grid.GetNode(yStart + y, xStart + x)))
+                        return true;
+            }
+
+            return false;
+        }
+        
+        static Node GetFallOnGroundNode(PathFindingGrid grid, int yStart, int xStart, int width) {
+            // Make sure that it's not out of grid.
+            for (int x = 0; x < width; x++) {
+                if (grid.GetNode(yStart, xStart + x) == null)
+                    return null;
+            }
+
+            while (!AnyNode(grid, yStart - 1, xStart, 1, width, IsGround)) {
+                --yStart;
+            }
+
+            return grid.GetNode(yStart, xStart);
+        }
+        
+        static bool CheckTrajectory(PathFindingGrid grid, PathFindingAgent agent, 
+            Node jumpStart, Node jumpLanding, int xDelta) {
         }
     }
 }

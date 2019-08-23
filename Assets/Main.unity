@@ -2088,12 +2088,12 @@ GameObject:
   - component: {fileID: 466606401}
   - component: {fileID: 466606402}
   m_Layer: 0
-  m_Name: Pathfinding
+  m_Name: PathfindingGrid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &466606401
 Transform:
   m_ObjectHideFlags: 0
@@ -2120,7 +2120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53a502d5ce49f2f478414c2d23af4fac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gridSizeX: 80
+  _gridSizeX: 76
   _gridSizeY: 30
   _cellSize: 0.25
   _collisionLayerMask:
@@ -4185,12 +4185,12 @@ PrefabInstance:
     - target: {fileID: 878415819916089660, guid: 9011788ce9ee6674da2578368698c754,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -12.18
+      value: -9.617
       objectReference: {fileID: 0}
     - target: {fileID: 878415819916089660, guid: 9011788ce9ee6674da2578368698c754,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.33
+      value: -0.666
       objectReference: {fileID: 0}
     - target: {fileID: 878415819916089660, guid: 9011788ce9ee6674da2578368698c754,
         type: 3}
@@ -4257,7 +4257,8 @@ PrefabInstance:
       propertyPath: m_BodyType
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 878415819916089663, guid: 9011788ce9ee6674da2578368698c754, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 9011788ce9ee6674da2578368698c754, type: 3}
 --- !u!1001 &1402180950
 PrefabInstance:
@@ -4397,12 +4398,12 @@ PrefabInstance:
     - target: {fileID: 8527159659160256989, guid: f6a9efeaf67aafc4a9210dec8e8d8603,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -12.41
+      value: -10.872
       objectReference: {fileID: 0}
     - target: {fileID: 8527159659160256989, guid: f6a9efeaf67aafc4a9210dec8e8d8603,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3.904
+      value: -0.644
       objectReference: {fileID: 0}
     - target: {fileID: 8527159659160256989, guid: f6a9efeaf67aafc4a9210dec8e8d8603,
         type: 3}
@@ -4490,12 +4491,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1610475275}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d0294269d00c6ed4482a6b5ebc274c3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pathFindingController: {fileID: 466606402}
+  _pathFindingGrid: {fileID: 466606402}
   _goalObject: {fileID: 429449223}
   _height: 1
   _width: 1

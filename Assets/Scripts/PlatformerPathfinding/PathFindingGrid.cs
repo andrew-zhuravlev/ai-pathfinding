@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace PlatformerPathFinding {
     public class PathFindingGrid : MonoBehaviour {
-        
         [SerializeField] int _gridSizeX;
         [SerializeField] int _gridSizeY;
         [SerializeField] float _cellSize;
@@ -19,18 +18,14 @@ namespace PlatformerPathFinding {
 
         public int MaxSize => _gridSizeX * _gridSizeY;
 
-        bool CheckNode(int y, int x) {
+        bool IsInsideGrid(int y, int x) {
             return x >= 0 && y >= 0 && x < _gridSizeX && y < _gridSizeY;
         }
 
-        public bool IsEmptyNode(int y, int x) {
-            return CheckNode(y, x) && GetNode(y, x).IsEmpty;
+        public Node GetNode(int y, int x) {
+            return IsInsideGrid(y, x) ? _grid[y, x] : null;
         }
 
-        public Node GetNode(int y, int x) {
-            return _grid[y, x];
-        }
-        
 
         void Start() {
             _grid = new Node[_gridSizeY, _gridSizeX];
@@ -43,7 +38,7 @@ namespace PlatformerPathFinding {
                     _grid[y, x] = new Node(!isOccupiedCell, cellCenter, x, y);
                 }
             }
-            
+
             _pathFindingRules = new PlatformerRules();
         }
 
@@ -58,7 +53,7 @@ namespace PlatformerPathFinding {
 
             var pointsPath = new List<Vector2>(path.Count);
             foreach (Node node in path)
-                pointsPath.Add(node.WorldPositionCenter);
+                pointsPath.Add(node.WorldPosition);
 
             return pointsPath;
         }
@@ -66,7 +61,7 @@ namespace PlatformerPathFinding {
         void OnDrawGizmos() {
             if (!_drawGrid)
                 return;
-            
+
             Vector2 bottomLeftCell = GetBottomLeftCellCenter();
 
             Vector2 size = Vector2.one * _cellSize;
@@ -80,12 +75,12 @@ namespace PlatformerPathFinding {
                 }
             }
         }
-        
+
         bool IsOccupiedCell(Vector2 worldPos) {
             return Physics2D.OverlapBox(worldPos, new Vector2(_cellSize, _cellSize) - Vector2.one * 0.05f, 0,
                 _collisionLayerMask);
         }
-               
+
         // TODO Optimize: without GetBottomLeftCellCenter.
         public Node WorldPositionToNode(Vector2 worldPos) {
             Vector2 bottomLeftCell = GetBottomLeftCellCenter();
@@ -95,15 +90,6 @@ namespace PlatformerPathFinding {
             return GetNode(y, x);
         }
 
-        // TODO: Two nearly identical methods.
-        public Vector2Int WorldPositionToNodeXY(Vector2 worldPos) {
-            Vector2 bottomLeftCell = GetBottomLeftCellCenter();
-            int x = Mathf.Clamp(Mathf.RoundToInt((worldPos.x - bottomLeftCell.x) / _cellSize), 0, _gridSizeX - 1),
-                y = Mathf.Clamp(Mathf.RoundToInt((worldPos.y - bottomLeftCell.y) / _cellSize), 0, _gridSizeY - 1);
-            
-            return new Vector2Int(x, y);
-        }
-               
         Vector2 GetBottomLeftCellCenter() {
             var gridCenter = (Vector2) transform.position;
             return new Vector2(gridCenter.x - (_gridSizeX / 2f - .5f) * _cellSize,

@@ -5,6 +5,7 @@ namespace PlatformerPathFinding {
         public static List<Node> Search(this PathFindingGrid pathFindingGrid, Node start, Node goal, 
             IPathFindingRules rules, PathFindingAgent agent) {
             
+            // TODO: Remove new allocation.
             var openSet = new Heap<Node>(pathFindingGrid.MaxSize);
             var closedSet = new HashSet<Node>();
             openSet.Add(start);
@@ -35,19 +36,19 @@ namespace PlatformerPathFinding {
                 }
             }
 
-            return foundGoal ? RetracePath(goal) : null;
+            return foundGoal ? RetracePath(start, goal) : null;
         }
 
         // TODO: Capacity via Parent: counter.
-        static List<Node> RetracePath(Node goal) {
-            var result = new List<Node> { goal };
-            var currentNode = goal.Parent;
-
-            while (currentNode != null) {
-                result.Insert(0, currentNode);
+        static List<Node> RetracePath(Node start, Node goal) {
+            var path = new List<Node>();
+            Node currentNode = goal;
+            while (currentNode != start) {
+                path.Add(currentNode);
                 currentNode = currentNode.Parent;
             }
-            return result;
+            path.Reverse();
+            return path;
         }
     }
 }
