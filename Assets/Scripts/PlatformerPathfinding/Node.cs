@@ -1,13 +1,6 @@
 using UnityEngine;
 
 namespace PlatformerPathFinding {
-
-    public enum TransitionType {
-        None,
-        Walk,
-        Jump
-    }
-    
     public class Node : IHeapItem<Node> {
         public bool IsEmpty { get; }
         public Vector2 WorldPosition { get; }

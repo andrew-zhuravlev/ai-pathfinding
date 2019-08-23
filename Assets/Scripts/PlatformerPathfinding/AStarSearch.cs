@@ -30,8 +30,11 @@ namespace PlatformerPathFinding {
                     break;                    
                 }
 
-                foreach (Node neighbour in rules.GetNeighbours(_pathFindingGrid, node, agent)) {
-                    if (/*!neighbour.IsWalkable ||*/ _closedSet.Contains(neighbour))
+                int neighboursCount;
+                var nodes = rules.GetNeighbours(_pathFindingGrid, node, agent, out neighboursCount);
+                for (var i = 0; i < neighboursCount; i++) {
+                    Node neighbour = nodes[i];
+                    if ( /*!neighbour.IsWalkable ||*/ _closedSet.Contains(neighbour))
                         continue;
 
                     int newCost = node.GCost + rules.GetCost(node, neighbour, agent);

@@ -18,7 +18,7 @@ public class PathFindingAgent : MonoBehaviour {
     
     void Update() {
         //if (Input.GetMouseButtonDown(0)) {
-            _path = _pathFindingGrid.FindPath(this, _goalObject);
+        _path = _pathFindingGrid.FindPath(this, _goalObject);
         //}
     }
 

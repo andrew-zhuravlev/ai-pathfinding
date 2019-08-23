@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace PlatformerPathFinding {
     public class PathFindingGrid : MonoBehaviour {
+
+        [SerializeField] PathFindingAgent _agent;
+        
         [SerializeField] int _gridSizeX;
         [SerializeField] int _gridSizeY;
         [SerializeField] float _cellSize;
@@ -40,7 +43,7 @@ namespace PlatformerPathFinding {
                 }
             }
 
-            _pathFindingRules = new PlatformerRules();
+            _pathFindingRules = new PlatformerRules(_agent);
             _search = new AStarSearch(this);
         }
 

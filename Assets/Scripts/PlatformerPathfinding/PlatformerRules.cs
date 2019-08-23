@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace PlatformerPathFinding {
@@ -7,6 +6,12 @@ namespace PlatformerPathFinding {
         static readonly Func<Node, bool> IsGround = n => n == null || !n.IsEmpty;
         static readonly Func<Node, bool> IsAir = n => n != null && n.IsEmpty;
 
+        public PlatformerRules(PathFindingAgent agent) {
+            int neighboursMaxSize = 2 + 2 * (agent.JumpStrength - 1);
+            _neighbours = new Node[neighboursMaxSize];
+        }
+
+        readonly Node[] _neighbours;
 
         public int GetHeuristic(Node node, Node goal, PathFindingAgent agent) {
             return Mathf.Abs(node.X - goal.X) + Mathf.Abs(node.Y - goal.Y);
@@ -22,8 +27,9 @@ namespace PlatformerPathFinding {
             return agent.JumpStrength + Mathf.Abs(deltaX) + agent.JumpStrength - deltaY;
         }
 
-        public IEnumerable<Node> GetNeighbours(PathFindingGrid grid, Node node, PathFindingAgent agent) {
-            var neighbours = new List<Node>();
+        public Node[] GetNeighbours(PathFindingGrid grid, Node node, PathFindingAgent agent, out int count) {
+            
+            count = 0;
 
             bool isGrounded = AnyNode(grid, node.Y - 1, node.X, 1, agent.Width, IsGround);
             if (isGrounded) {
@@ -32,12 +38,14 @@ namespace PlatformerPathFinding {
                 
                 if (AllNodes(grid, node.Y, node.X - 1, agent.Height, 1, IsAir)) {
                     neighbour = grid.GetNode(node.Y, node.X - 1);
-                    neighbours.Add(neighbour);
+
+                    _neighbours[count++] = neighbour;
                 }
 
                 if (AllNodes(grid, node.Y, node.X + agent.Width, agent.Height, 1, IsAir)) {
                     neighbour = grid.GetNode(node.Y, node.X + 1);
-                    neighbours.Add(neighbour);
+
+                    _neighbours[count++] = neighbour;
                 }
 
 
@@ -48,7 +56,7 @@ namespace PlatformerPathFinding {
                         continue;
 
                     if (CheckTrajectory(grid, agent, node, neighbour, x))
-                        neighbours.Add(neighbour);
+                        _neighbours[count++] = neighbour;
                 }
 
                 // Jump to the Left
@@ -56,16 +64,16 @@ namespace PlatformerPathFinding {
                     neighbour = GetFallOnGroundNode(grid, node.Y + agent.JumpStrength, node.X + x, agent.Width);
                     if (neighbour == null)
                         continue;
-                    
+
                     if (CheckTrajectory(grid, agent, node, neighbour, x))
-                        neighbours.Add(neighbour);
+                        _neighbours[count++] = neighbour;
                 }
             }
             // Falling Down. This should only happen if spawned above the ground.
             else
-                neighbours.Add(grid.GetNode(node.Y - 1, node.X));
+                _neighbours[count++] = grid.GetNode(node.Y - 1, node.X);
 
-            return neighbours;
+            return _neighbours;
         }
 
         /// <summary>
