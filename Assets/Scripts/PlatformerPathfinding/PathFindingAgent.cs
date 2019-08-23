@@ -19,7 +19,9 @@ public class PathFindingAgent : MonoBehaviour {
     List<Vector2> _path;
     
     void Update() {
-        _path = _pathFindingGrid.FindPath(this, _goalObject);
+        //if (Input.GetMouseButtonDown(0)) {
+            _path = _pathFindingGrid.FindPath(this, _goalObject);
+        //}
     }
 
     void OnDrawGizmos() {

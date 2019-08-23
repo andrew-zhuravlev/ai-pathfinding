@@ -14,10 +14,6 @@ namespace PlatformerPathFinding {
         }
 
         public int GetCost(Node fromNode, Node toNode, PathFindingAgent agent) {
-            
-            //todo remove 
-            return 1;
-            
             int deltaY = toNode.Y - fromNode.Y,
                 deltaX = toNode.X - fromNode.X;
             // Step to the side.
@@ -129,6 +125,25 @@ namespace PlatformerPathFinding {
         
         static bool CheckTrajectory(PathFindingGrid grid, PathFindingAgent agent, 
             Node jumpStart, Node jumpLanding, int xDelta) {
+            
+            float cellSize = grid.CellSize;
+            
+            Vector2 a = jumpStart.WorldPosition + new Vector2(-.5f, agent.Height - .5f) * cellSize;
+            Vector2 b = a + Vector2.up * (agent.JumpHeight * cellSize);
+            Vector2 c = b + Vector2.right * (xDelta * cellSize);
+            Vector2 d = jumpLanding.WorldPosition + new Vector2(-.5f, agent.Height - .5f) * cellSize;
+            
+            var bezierCurve = new BezierCurve(a, b, c, d);
+
+            float offset = 0.1f;
+            for (float t = offset; t < 1; t += offset) {
+                var curveValue = bezierCurve.GetValue(t);
+                var node = grid.WorldPositionToNode(curveValue);
+                if (!IsAir(node))
+                    return false;
+            }
+
+            return true;
         }
     }
 }

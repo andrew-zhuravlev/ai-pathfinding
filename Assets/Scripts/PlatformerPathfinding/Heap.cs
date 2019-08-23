@@ -3,7 +3,6 @@
 public class Heap<T> where T : IHeapItem<T> {
     readonly T[] _items;
 
-    // TODO: Optimize.
     public Heap(int maxHeapSize) {
         _items = new T[maxHeapSize];
     }

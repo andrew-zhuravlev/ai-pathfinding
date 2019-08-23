@@ -81,7 +81,6 @@ namespace PlatformerPathFinding {
                 _collisionLayerMask);
         }
 
-        // TODO Optimize: without GetBottomLeftCellCenter.
         public Node WorldPositionToNode(Vector2 worldPos) {
             Vector2 bottomLeftCell = GetBottomLeftCellCenter();
             int x = Mathf.Clamp(Mathf.RoundToInt((worldPos.x - bottomLeftCell.x) / _cellSize), 0, _gridSizeX - 1),
