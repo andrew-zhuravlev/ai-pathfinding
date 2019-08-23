@@ -7,11 +7,9 @@ public class PathFindingAgent : MonoBehaviour {
     [SerializeField] Transform _goalObject;
     [SerializeField] int _height;
     [SerializeField] int _width;
-    [SerializeField] int _jumpHeight = 5;
-    [SerializeField] int _jumpHorizontal = 5;
+    [SerializeField] int _jumpStrength = 5;
 
-    public int JumpHeight => _jumpHeight;
-    public int JumpHorizontal => _jumpHorizontal;
+    public int JumpStrength => _jumpStrength;
 
     public int Height => _height;
     public int Width => _width;

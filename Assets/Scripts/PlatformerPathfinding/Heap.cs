@@ -22,6 +22,10 @@ public class Heap<T> where T : IHeapItem<T> {
         SortDown(_items[0]);
         return firstItem;
     }
+    
+    public void Clear() {
+        Count = 0;
+    }
 
     public void UpdateItem(T item) {
         SortUp(item);

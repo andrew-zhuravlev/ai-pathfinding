@@ -20,7 +20,7 @@ namespace PlatformerPathFinding {
             if (deltaY == 0 && (deltaX == -1 || deltaX == 1))
                 return 1;
             // Performed jump.
-            return agent.JumpHeight + Mathf.Abs(deltaX) + agent.JumpHeight - deltaY;
+            return agent.JumpStrength + Mathf.Abs(deltaX) + agent.JumpStrength - deltaY;
         }
 
         public IEnumerable<Node> GetNeighbours(PathFindingGrid grid, Node node, PathFindingAgent agent) {
@@ -35,12 +35,12 @@ namespace PlatformerPathFinding {
                     neighbours.Add(grid.GetNode(node.Y, node.X - 1));
                 
                 if (AllNodes(grid, node.Y, node.X + agent.Width, agent.Height, 1, IsAir))
-                    neighbours.Add(grid.GetNode(node.Y, node.X + agent.Width));
+                    neighbours.Add(grid.GetNode(node.Y, node.X + 1));
 
                 
                 // Jump to the Right
-                for (var x = 2; x <= agent.JumpHorizontal; ++x) {
-                    var jumpLanding = GetFallOnGroundNode(grid, node.Y + agent.JumpHeight, node.X + x, agent.Width);
+                for (var x = 2; x <= agent.JumpStrength; ++x) {
+                    var jumpLanding = GetFallOnGroundNode(grid, node.Y + agent.JumpStrength, node.X + x, agent.Width);
                     if (jumpLanding == null)
                         continue;
                     
@@ -49,14 +49,14 @@ namespace PlatformerPathFinding {
                 }
                 
                 // Jump to the Left
-//                for (var x = -2; x >= -agent.JumpHorizontal; --x) {
-//                    var jumpLanding = GetFallOnGroundNode(grid, node.Y + agent.JumpHeight, node.X + x, agent.Width);
-//                    if (jumpLanding == null)
-//                        continue;
-//                    
-//                    if (CheckTrajectory(grid, agent, node, jumpLanding, x))
-//                        neighbours.Add(jumpLanding);
-//                }
+                for (var x = -2; x >= -agent.JumpStrength; --x) {
+                    var jumpLanding = GetFallOnGroundNode(grid, node.Y + agent.JumpStrength, node.X + x, agent.Width);
+                    if (jumpLanding == null)
+                        continue;
+                    
+                    if (CheckTrajectory(grid, agent, node, jumpLanding, x))
+                        neighbours.Add(jumpLanding);
+                }
             }
             // Falling Down. This should only happen if spawned above the ground.
             else
@@ -124,22 +124,32 @@ namespace PlatformerPathFinding {
         }
         
         static bool CheckTrajectory(PathFindingGrid grid, PathFindingAgent agent, 
-            Node jumpStart, Node jumpLanding, int xDelta) {
+            Node jumpStart, Node jumpLanding, int xDelta, int precision = 20) {
             
             float cellSize = grid.CellSize;
             
             Vector2 a = jumpStart.WorldPosition + new Vector2(-.5f, agent.Height - .5f) * cellSize;
-            Vector2 b = a + Vector2.up * (agent.JumpHeight * cellSize);
+            Vector2 b = a + Vector2.up * (agent.JumpStrength * cellSize);
             Vector2 c = b + Vector2.right * (xDelta * cellSize);
             Vector2 d = jumpLanding.WorldPosition + new Vector2(-.5f, agent.Height - .5f) * cellSize;
             
             var bezierCurve = new BezierCurve(a, b, c, d);
 
-            float offset = 0.1f;
+            //Node lastNode = null;
+            float offset = 1f / precision;
             for (float t = offset; t < 1; t += offset) {
                 var curveValue = bezierCurve.GetValue(t);
                 var node = grid.WorldPositionToNode(curveValue);
-                if (!IsAir(node))
+
+                //if (node == lastNode)
+                    //continue;
+                
+                //lastNode = node;
+                
+                if (!AllNodes(grid, node.Y, node.X, 1, agent.Width + 1, IsAir))
+                    return false;
+
+                if (!AllNodes(grid, node.Y - (agent.Height - 1), node.X + agent.Width - 1, agent.Height - 1, 1, IsAir))
                     return false;
             }
 

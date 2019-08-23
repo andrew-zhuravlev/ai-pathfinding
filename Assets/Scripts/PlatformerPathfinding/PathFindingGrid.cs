@@ -10,6 +10,7 @@ namespace PlatformerPathFinding {
         [SerializeField] bool _drawGrid = true;
 
         IPathFindingRules _pathFindingRules;
+        AStarSearch _search;
 
         Node[,] _grid;
         Node _start, _goal;
@@ -40,6 +41,7 @@ namespace PlatformerPathFinding {
             }
 
             _pathFindingRules = new PlatformerRules();
+            _search = new AStarSearch(this);
         }
 
         public List<Vector2> FindPath(PathFindingAgent agent, Transform goalObject) {
@@ -47,7 +49,7 @@ namespace PlatformerPathFinding {
             Node start = WorldPositionToNode(agent.transform.position);
             Node goal = WorldPositionToNode(goalObject.position);
 
-            var path = this.Search(start, goal, _pathFindingRules, agent);
+            var path = _search.Search(start, goal, _pathFindingRules, agent);
             if (path == null)
                 return null;
 
