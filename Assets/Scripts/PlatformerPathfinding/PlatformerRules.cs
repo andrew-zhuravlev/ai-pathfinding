@@ -11,6 +11,7 @@ namespace PlatformerPathFinding {
             _neighbours = new Node[neighboursMaxSize];
         }
 
+        // Was added to reduce GC allocations.
         readonly Node[] _neighbours;
 
         public int GetHeuristic(Node node, Node goal, PathFindingAgent agent) {
@@ -20,10 +21,9 @@ namespace PlatformerPathFinding {
         public int GetCost(Node fromNode, Node toNode, PathFindingAgent agent) {
             int deltaY = toNode.Y - fromNode.Y,
                 deltaX = toNode.X - fromNode.X;
-            // Step to the side.
-            if (Node.IsWalkTransition(fromNode, toNode))
+            
+            if (Node.IsWalkTransition(fromNode, toNode) != TransitionType.Jump)
                 return 1;
-            // Performed jump.
             return agent.JumpStrength + Mathf.Abs(deltaX) + agent.JumpStrength - deltaY;
         }
 
@@ -158,10 +158,10 @@ namespace PlatformerPathFinding {
                 if (node == lastNode) {
                     continue;
                 }
-                
+
                 if (!AllNodes(grid, node.Y, node.X, 1, agent.Width + 1, IsAir))
                     return false;
-                    
+
                 if (isRight) {
                     if (!AllNodes(grid, node.Y - (agent.Height - 1), node.X + agent.Width,
                         agent.Height + 1, 1, IsAir)) {
@@ -174,6 +174,7 @@ namespace PlatformerPathFinding {
                         return false;
                     }
                 }
+
 
                 lastNode = node;
             }

@@ -58,17 +58,18 @@ namespace PlatformerPathFinding {
             var path = new List<Node>();
             Node currentNode = goal;
 
-            bool isPreviousWalk = false;
+            TransitionType previousTransition = TransitionType.None;
             
             while (currentNode != start) {
 
                 Node parent = currentNode.Parent;
-                bool isCurrentWalk = Node.IsWalkTransition(parent, currentNode);
+                var currentTransition = Node.IsWalkTransition(parent, currentNode);
 
-                if (!(isPreviousWalk && isCurrentWalk))
+                if (!(previousTransition == TransitionType.Walk && currentTransition == TransitionType.Walk) 
+                    && !(previousTransition == TransitionType.Fall && currentTransition == TransitionType.Fall))
                     path.Add(currentNode);
 
-                isPreviousWalk = isCurrentWalk;
+                previousTransition = currentTransition;
                 currentNode = parent;
             }
             

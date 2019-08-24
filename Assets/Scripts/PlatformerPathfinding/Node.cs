@@ -1,6 +1,14 @@
 using UnityEngine;
 
 namespace PlatformerPathFinding {
+    
+    public enum TransitionType {
+        None,
+        Walk,
+        Jump,
+        Fall,
+    }
+    
     public class Node : IHeapItem<Node> {
         public bool IsEmpty { get; }
         public Vector2 WorldPosition { get; }
@@ -18,7 +26,7 @@ namespace PlatformerPathFinding {
         int FCost => GCost + HCost;
 
         public Node Parent { get; set; }
-        
+
         public Node(bool isEmpty, Vector2 worldPosition, int x, int y) {
             IsEmpty = isEmpty;
             WorldPosition = worldPosition;
@@ -26,10 +34,16 @@ namespace PlatformerPathFinding {
             Y = y;
         }
 
-        public static bool IsWalkTransition(Node fromNode, Node toNode) {
+        public static TransitionType IsWalkTransition(Node fromNode, Node toNode) {
             int deltaY = toNode.Y - fromNode.Y,
                 deltaX = toNode.X - fromNode.X;
-            return deltaY == 0 && (deltaX == -1 || deltaX == 1);
+            
+            if (deltaY == 0 && (deltaX == -1 || deltaX == 1))
+                return TransitionType.Walk;
+            if (deltaY == -1 && deltaX == 0)
+                return TransitionType.Fall;
+            
+            return TransitionType.Jump;
         }
 
         public int HeapIndex { get; set; }

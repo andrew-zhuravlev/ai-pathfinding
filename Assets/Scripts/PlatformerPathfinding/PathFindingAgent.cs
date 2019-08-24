@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using PlatformerPathFinding;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public class PathFindingAgent : MonoBehaviour {
     [SerializeField] PathFindingGrid _pathFindingGrid;
@@ -17,9 +19,16 @@ public class PathFindingAgent : MonoBehaviour {
     List<Node> _path;
     
     void Update() {
-        //if (Input.GetMouseButtonDown(0)) {
+        // (!Input.GetMouseButtonDown(0))
+            //return;
+            
+        //Stopwatch sw = new Stopwatch();
+        //sw.Start();
+        
         _path = _pathFindingGrid.FindPath(this, _goalObject);
-        //}
+        
+        //sw.Stop();
+        //Debug.Log(sw.ElapsedMilliseconds);
     }
 
     void OnDrawGizmos() {

@@ -22,6 +22,9 @@ namespace PlatformerPathFinding {
 
         public int MaxSize => _gridSizeX * _gridSizeY;
 
+        // TODO:
+        Vector2 _position;
+
         bool IsInsideGrid(int y, int x) {
             return x >= 0 && y >= 0 && x < _gridSizeX && y < _gridSizeY;
         }
@@ -34,6 +37,8 @@ namespace PlatformerPathFinding {
         void Start() {
             _grid = new Node[_gridSizeY, _gridSizeX];
 
+            _position = transform.position;
+            
             Vector2 bottomLeftCell = GetBottomLeftCellCenter();
             for (var y = 0; y < _gridSizeY; ++y) {
                 for (var x = 0; x < _gridSizeX; ++x) {
@@ -54,11 +59,17 @@ namespace PlatformerPathFinding {
             return _search.Search(start, goal, _pathFindingRules, agent);
         }
 
+        Vector2 GetBottomLeftCellViaTransform() {
+            var pos = transform.position;
+            return new Vector2(pos.x - (_gridSizeX / 2f - .5f) * _cellSize,
+                pos.y - (_gridSizeY / 2f - .5f) * _cellSize);    
+        }
+
         void OnDrawGizmos() {
             if (!_drawGrid)
                 return;
 
-            Vector2 bottomLeftCell = GetBottomLeftCellCenter();
+            Vector2 bottomLeftCell = GetBottomLeftCellViaTransform();
 
             Vector2 size = Vector2.one * _cellSize;
             for (var y = 0; y < _gridSizeY; ++y) {
@@ -86,9 +97,8 @@ namespace PlatformerPathFinding {
         }
 
         Vector2 GetBottomLeftCellCenter() {
-            var gridCenter = (Vector2) transform.position;
-            return new Vector2(gridCenter.x - (_gridSizeX / 2f - .5f) * _cellSize,
-                gridCenter.y - (_gridSizeY / 2f - .5f) * _cellSize);
+            return new Vector2(_position.x - (_gridSizeX / 2f - .5f) * _cellSize,
+                _position.y - (_gridSizeY / 2f - .5f) * _cellSize);
         }
     }
 }
